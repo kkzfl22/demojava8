@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>       
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">       
+          
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/' >          
+	
+	<appender name="myConsole" class="org.apache.log4j.ConsoleAppender">       
+		<layout class="org.apache.log4j.PatternLayout">       
+			<param name="ConversionPattern"          
+				value="[%p][%d{yyyy-MM-dd HH:mm:ss,SSS}] [%r] [%l] [%t]  %c{2\} - %m%n" />       
+		</layout>    
+		<!--使用过滤   
+			<filter class="org.apache.log4j.varia.LevelRangeFilter">       
+				<param name="levelMin" value="info" />       
+				<param name="levelMax" value="error" />       
+				<param name="AcceptOnMatch" value="true" />       
+			</filter>  
+			-->     
+	</appender>     
+	
+	<appender name="errorLogFile" class="org.apache.log4j.RollingFileAppender">          
+		<param name="File" value="logs/demo_error_xml.log" /><!-- 设置日志输出文件名 -->       
+		<!-- 设置是否在重新启动服务时，在原有日志的基础添加新日志 -->       
+		<param name="Append" value="true" />       
+		<param name="MaxBackupIndex" value="10" />       
+		<layout class="org.apache.log4j.PatternLayout">       
+			<param name="ConversionPattern" value="%p (%c:%L)- %m%n" />       
+		</layout>   
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">       
+			<param name="levelMin" value="ERROR" />       
+			<param name="AcceptOnMatch" value="true" />       
+		</filter>     
+	</appender>       
+         
+	<appender name="serviceLog" class="org.apache.log4j.DailyRollingFileAppender">       
+		<param name="File" value="logs/demo_service.log" />         
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />         
+		<layout class="org.apache.log4j.PatternLayout">       
+			<param name="ConversionPattern"         
+				value="[%p][%d{yyyy-MM-dd HH:mm:ss,SSS}] [%r] [%l] [%t]  %c{4\} - %m%n" />       
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">       
+			<param name="levelMin" value="INFO" />       
+			<param name="AcceptOnMatch" value="true" />       
+		</filter>          
+	</appender>       
+          
+	<!-- 指定logger的设置，additivity指示是否遵循缺省的继承机制  
+		<logger name="com" additivity="false" >       
+			<level value="A" />
+			<appender-ref ref="activexAppender" />         
+		</logger>     
+			-->
+	<logger name="com" additivity="true">       
+		<level value="ALL" />
+		<appender-ref ref="errorLogFile"/>         
+	</logger>      
+	
+	<logger name="com.liujun" >       
+		<level value="ALL" />
+		<appender-ref ref="serviceLog"/>         
+	</logger>	
+	
+	<!-- 根logger的设置     -->     
+	<root>       
+		<priority value="DEBUG"/>  
+		<appender-ref ref="myConsole"/>       
+	</root> 
+	   
+</log4j:configuration> 
