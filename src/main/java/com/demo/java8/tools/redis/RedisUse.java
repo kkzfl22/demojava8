@@ -58,14 +58,13 @@ public class RedisUse {
 				long maxlen = jedis.llen(KEY);
 				if (maxlen <= 0) {
 					System.out.println("休眠");
-					condi.await(1, TimeUnit.SECONDS);
+					condi.await(3, TimeUnit.SECONDS);
 				} else {
 
 					// 如果未超过大小，则直接放入
 					String value = jedis.lindex(KEY, 0);
 
 					System.out.println("获取数据:" + value);
-
 
 					// 然后获取数据
 					String getLpop = jedis.lpop(KEY);
