@@ -34,4 +34,6 @@ public enum Operation {
 	;
 
 	abstract double apply(double x, double y);
+	
+	
 }
