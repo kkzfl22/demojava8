@@ -1,6 +1,8 @@
 package com.demo.effectivejava.thirty.third.good;
 
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,14 +32,35 @@ public class Herb {
 	public String toString() {
 		return "Herb [name=" + name + ", type=" + type + "]";
 	}
-	
-	
+
 	/**
-	 * 有一种更好的方法可以达到同样的效果，数组实际上充当着从枚举到值的映射，因此可能还要用到Map,更具体的说，有一种非常快速的Map实现专门用于枚举键，称作java.util.EnumMap
+	 * 有一种更好的方法可以达到同样的效果，数组实际上充当着从枚举到值的映射，因此可能还要用到Map,
+	 * 
+	 * 更具体的说，有一种非常快速的Map实现专门用于枚举键，称作java.util.EnumMap
 	 */
 	public void print() {
 
-		
+		Herb[] garden = new Herb[] { new Herb("1", Herb.Type.ANNUAL) };
+
+		Map<Herb.Type, Set<Herb>> herbsByType = new EnumMap<Herb.Type, Set<Herb>>(Herb.Type.class);
+
+		for (Herb.Type t : Herb.Type.values()) {
+			herbsByType.put(t, new HashSet<Herb>());
+		}
+
+		for (Herb herb : garden) {
+			herbsByType.get(herb.type).add(herb);
+		}
+
+		System.out.println(herbsByType);
+
 	}
-	
+
+	public static void main(String[] args) {
+
+		Herb herss = new Herb("this", Herb.Type.ANNUAL);
+		herss.print();
+
+	}
+
 }

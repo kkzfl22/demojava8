@@ -42,7 +42,7 @@ public class Herb {
 	@SuppressWarnings("unchecked")
 	public void print() {
 
-		Herb[] garden = new Herb[3];
+		Herb[] garden = new Herb[] { new Herb("1", Herb.Type.ANNUAL) };
 
 		Set<Herb>[] herbsByType = new Set[Herb.Type.values().length];
 
@@ -59,5 +59,5 @@ public class Herb {
 		}
 
 	}
-	
+
 }
