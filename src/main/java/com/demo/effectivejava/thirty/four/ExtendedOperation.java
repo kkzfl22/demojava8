@@ -58,7 +58,7 @@ public enum ExtendedOperation implements Operation {
 	 * doc:使用Collection<? extends Operation>，就有个有限制的通配符类型(bounded wildcar
 	 * type)作这opSet参数类型
 	 * 
-	 * @param opset
+	 * @param opset 
 	 * @param x
 	 * @param y
 	 */
