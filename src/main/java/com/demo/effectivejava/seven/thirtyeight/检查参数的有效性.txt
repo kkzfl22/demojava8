@@ -1,0 +1,8 @@
+对于公有的方法，要用 Javadoc的@throws标签（tag)在文档中说明违反参数值 限制时会抛出的异常.
+这样的异常通常为IllegalArgumentException、IndexOutOfBoundsException或者NullPointerException。
+一旦在文档中记录了对于方法参数的限制，并记录了一旦违反 这些限制将要抛出的异常，强加这些限制就是非常简单的事情了
+
+IllegalArgumentException 参数不合法的异常
+IndexOutOfBoundsException 数组下标越界异常
+NullPointerException 空指针异常
+
