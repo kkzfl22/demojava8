@@ -1,4 +1,4 @@
-package com.demo.effectivejava.seven.thirtymime.third;
+package com.demo.effectivejava.seven.thirtynine.one;
 
 import java.util.Date;
 
@@ -10,10 +10,8 @@ public class TestPeriod {
 		Date end = new Date();
 		
 		Period p = new Period(start, end);
-		
-		p.getEnd().setYear(78);
-		
-		System.out.println(p.getEnd());
+		//此存在可变
+		end.setYear(78);
 		
 	}
 }

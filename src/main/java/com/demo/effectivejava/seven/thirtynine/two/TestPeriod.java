@@ -1,4 +1,4 @@
-package com.demo.effectivejava.seven.thirtymime.two;
+package com.demo.effectivejava.seven.thirtynine.two;
 
 import java.util.Date;
 
@@ -11,6 +11,7 @@ public class TestPeriod {
 		
 		Period p = new Period(start, end);
 		
+		//此还存在可以对对象的修改
 		p.getEnd().setYear(78);
 		
 		System.out.println(p.getEnd());

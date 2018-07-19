@@ -1,4 +1,4 @@
-package com.demo.effectivejava.seven.thirtymime.one;
+package com.demo.effectivejava.seven.thirtynine.one;
 
 import java.util.Date;
 

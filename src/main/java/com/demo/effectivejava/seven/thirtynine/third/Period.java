@@ -1,11 +1,8 @@
-package com.demo.effectivejava.seven.thirtymime.two;
+package com.demo.effectivejava.seven.thirtynine.third;
 
 import java.util.Date;
 
 /**
- * doc:虽然替换构造器就可以成功地避免上述的攻击，但是改变Period实践仍然是有可能的，
- * 
- * 因为它的访问提供了对其可这对内部了成员的访问能力。
  * 
  * @author liujun
  * @date 2018/07/18
@@ -17,9 +14,7 @@ public final class Period {
 	private final Date end;
 
 	/**
-	 * doc:使用了新的构造器之后，上述的攻击对于Period实际不再有效。
 	 * 
-	 * 保护性的拷贝是在检查参数的有效性之前进行，并且有效性检查是针对拷贝之后的对象，而不是针对原始对象
 	 * 
 	 * @param start
 	 * @param end
@@ -35,11 +30,11 @@ public final class Period {
 	}
 
 	public Date getStart() {
-		return start;
+		return new Date(start.getTime());
 	}
 
 	public Date getEnd() {
-		return end;
+		return new Date(end.getTime());
 	}
 
 }
