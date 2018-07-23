@@ -1,0 +1,10 @@
+为了捕获失败，异常的细节信息应该包含所有“对该异常有贡献”的参数和域的值。
+例如IndexOutOfBoundsException异常的细节消息应该包含下界、上界以及没有落在界内的下标值.
+
+public IndexOutOfBoundsexception(int lowerBound,int upperBound,int index)
+{
+	super("Lower bound:"+lowerBound+",Upper bound :"+upperBound+",Index:"+index);
+	this.lowerBound = lowerBound;
+	this.upperBound = upperBound;
+	this.index = index;
+}
