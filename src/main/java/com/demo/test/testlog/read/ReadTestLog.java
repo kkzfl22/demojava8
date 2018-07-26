@@ -113,7 +113,7 @@ public class ReadTestLog {
 
 	public static void main(String[] args) {
 		ReadTestLog instance = new ReadTestLog();
-		String filePath = "E:/test/km_jpgtojpgthread_10000_18.log";
+		String filePath = "E:/test/km_jpgtozcc.log";
 		List<LogFileInfoBo> list = instance.readList(filePath);
 		instance.outExcelPrint(list);
 		System.out.println(list.size());
