@@ -1,4 +1,4 @@
-package com.guava.optional;
+package com.guava.baseutils.optional;
 
 import org.junit.Test;
 import com.google.common.base.Optional;
@@ -27,7 +27,7 @@ public class OptionalTest {
 		Optional<Integer> nullableOpt = Optional.fromNullable(null);
 		Optional<Integer> notnullableOpt = Optional.fromNullable(10);
 		
-		possOpt.of(1).or(2);
+		
 		
 		if(possOpt.isPresent())
 		{

@@ -1,4 +1,4 @@
-package com.guava.optional.demo2;
+package com.guava.baseutils.optional.demo2;
 
 import org.junit.Test;
 

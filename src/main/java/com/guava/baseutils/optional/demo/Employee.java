@@ -1,9 +1,9 @@
-package com.guava.optional.demo2;
+package com.guava.baseutils.optional.demo;
 
-public class User {
+public class Employee {
 
 	/**
-	 * 用户名
+	 * name
 	 */
 	private String name;
 
@@ -12,7 +12,7 @@ public class User {
 	 */
 	private int age;
 
-	public User(String name, int age) {
+	public Employee(String name, int age) {
 		super();
 		this.name = name;
 		this.age = age;
@@ -37,7 +37,7 @@ public class User {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("User [name=");
+		builder.append("Employee [name=");
 		builder.append(name);
 		builder.append(", age=");
 		builder.append(age);
