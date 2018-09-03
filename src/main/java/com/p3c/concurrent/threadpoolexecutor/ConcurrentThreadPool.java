@@ -57,17 +57,51 @@ public class ConcurrentThreadPool {
             TimeUnit.SECONDS,
             queue,
             fctory,
-            new ThreadPoolExecutor.AbortPolicy());
+            new ThreadPoolExecutor.CallerRunsPolicy());
+
+    ConcurrentThreadPool countPool = new ConcurrentThreadPool();
+
+    countPool.runPrintThreadPool(pool);
 
     for (int i = 0; i < 28; i++) {
       try {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
         // 进行任务的提交操作
         pool.submit(new RunWorker(i));
-        System.out.println("work:" + i + ",submit success");
+       // System.out.println("work:" + i + ",submit success");
       } catch (Exception e) {
         System.out.println("work:" + i + ",submit fail");
         e.printStackTrace();
       }
     }
+  }
+
+  public void runPrintThreadPool(ThreadPoolExecutor pool) {
+    Thread thr =
+        new Thread(
+            new Runnable() {
+              @Override
+              public void run() {
+                for (int i = 0; i < 20; i++) {
+                  try {
+                    Thread.sleep(1000);
+                  } catch (InterruptedException e) {
+                    e.printStackTrace();
+                  }
+                  System.out.println(
+                      "curr pool:activeCount"
+                          + pool.getActiveCount()
+                          + ",taskCount"
+                          + pool.getTaskCount()
+                          + ",pool:"
+                          + pool.getQueue().size());
+                }
+              }
+            });
+    thr.start();
   }
 }

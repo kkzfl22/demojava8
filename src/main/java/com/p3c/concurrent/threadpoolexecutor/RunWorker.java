@@ -13,29 +13,29 @@ public class RunWorker implements Runnable {
   }
 
   /** 休眠第一时间 */
-  private static final long SLEEP_ONE = 1000l;
+  private static final long SLEEP_ONE = 10000l;
 
   @Override
   public void run() {
 
     try {
       if (ThreadLocalRandom.current().nextInt() % 2 == 1) {
-        System.out.println(
-            "curr thread:"
-                + Thread.currentThread().getName()
-                + ",sleep :"
-                + SLEEP_ONE
-                + ",index:"
-                + runIndex);
+        //        System.out.println(
+        //            "curr thread:"
+        //                + Thread.currentThread().getName()
+        //                + ",sleep :"
+        //                + SLEEP_ONE
+        //                + ",index:"
+        //                + runIndex);
         Thread.sleep(SLEEP_ONE);
       } else {
-        System.out.println(
-            "curr thread:"
-                + Thread.currentThread().getName()
-                + ",sleep :"
-                + SLEEP_ONE * 2
-                + ",index:"
-                + runIndex);
+        //        System.out.println(
+        //            "curr thread:"
+        //                + Thread.currentThread().getName()
+        //                + ",sleep :"
+        //                + SLEEP_ONE * 2
+        //                + ",index:"
+        //                + runIndex);
         Thread.sleep(SLEEP_ONE * 2);
       }
     } catch (Exception e) {
