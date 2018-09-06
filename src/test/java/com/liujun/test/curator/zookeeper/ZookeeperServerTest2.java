@@ -10,6 +10,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
 import org.apache.zookeeper.data.Stat;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,7 +33,6 @@ public class ZookeeperServerTest2 {
 
     client = Mockito.mock(CuratorFramework.class);
 
-
     // Create a mock curator to return mock kafka IP data
     ExistsBuilder existsBuilder = Mockito.mock(ExistsBuilder.class);
     Mockito.when(existsBuilder.forPath("")).thenReturn(new Stat());
@@ -40,16 +40,13 @@ public class ZookeeperServerTest2 {
     CreateBuilder createBuilder = Mockito.mock(CreateBuilder.class);
     Mockito.when(createBuilder.forPath("/test", "test-data".getBytes())).thenReturn("this");
 
-
     GetDataBuilder getDataBuilder = Mockito.mock(GetDataBuilder.class);
     Mockito.when(getDataBuilder.forPath("")).thenReturn("new value".getBytes());
 
     CuratorFramework curatorFramework = Mockito.mock(CuratorFramework.class);
 
-
-   Mockito.when(client.create()).thenReturn(createBuilder);
-   Mockito.when(client.create().forPath("/test", "test-data".getBytes())).thenReturn("this");
-
+    Mockito.when(client.create()).thenReturn(createBuilder);
+    Mockito.when(client.create().forPath("/test", "test-data".getBytes())).thenReturn("this");
   }
 
   @AfterClass
@@ -61,18 +58,12 @@ public class ZookeeperServerTest2 {
   @Test
   public void testFoobar() throws Exception {
     System.out.println("client: " + client);
-    client.create().forPath("/test", "test-data".getBytes());
+    String value = client.create().forPath("/test", "test-data".getBytes());
 
-    byte[] data = client.getData().forPath("/test");
-    System.out.println("data: " + new String(data));
-  }
+    System.out.println(value);
+    Assert.assertNotNull(value);
 
-  @Test
-  public void testFoobar2() throws Exception {
-    System.out.println("client: " + client);
-    client.create().forPath("/test", "test-data".getBytes());
-
-    byte[] data = client.getData().forPath("/test");
-    System.out.println("data: " + new String(data));
+    //    byte[] data = client.getData().forPath("/test");
+    //    System.out.println("data: " + new String(data));
   }
 }
