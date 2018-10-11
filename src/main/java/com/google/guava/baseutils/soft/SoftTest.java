@@ -1,4 +1,4 @@
-package com.guava.baseutils.soft;
+package com.google.guava.baseutils.soft;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,11 +7,9 @@ import javax.annotation.Nullable;
 
 import org.junit.Test;
 
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Ints;
-import com.google.common.base.*;
 
 public class SoftTest {
 

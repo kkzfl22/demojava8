@@ -1,4 +1,4 @@
-package com.guava.baseutils.optional;
+package com.google.guava.baseutils.optional;
 
 import org.junit.Test;
 import com.google.common.base.Optional;

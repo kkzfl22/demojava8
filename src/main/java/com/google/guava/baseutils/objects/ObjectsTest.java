@@ -1,4 +1,4 @@
-package com.guava.baseutils.objects;
+package com.google.guava.baseutils.objects;
 
 import org.junit.Test;
 

@@ -111,6 +111,13 @@
             <version>2.6</version>
         </dependency>
 
+        <!--google开源的字符串压缩库-->
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.7.2</version>
+        </dependency>
+
 
     </dependencies>
 

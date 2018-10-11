@@ -1,4 +1,4 @@
-package com.guava.baseutils.optional.demo2;
+package com.google.guava.baseutils.optional.demo2;
 
 public class User {
 

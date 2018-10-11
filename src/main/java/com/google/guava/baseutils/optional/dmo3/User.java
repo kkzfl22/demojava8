@@ -1,4 +1,4 @@
-package com.guava.baseutils.optional.dmo3;
+package com.google.guava.baseutils.optional.dmo3;
 
 public class User {
 

@@ -1,4 +1,4 @@
-package com.guava.baseutils.argument;
+package com.google.guava.baseutils.argument;
 
 import org.junit.Test;
 

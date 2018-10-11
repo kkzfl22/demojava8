@@ -1,4 +1,4 @@
-package com.guava.collections.collection;
+package com.google.guava.collections.collection;
 
 import java.util.List;
 import java.util.Map;

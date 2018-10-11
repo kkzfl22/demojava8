@@ -1,4 +1,4 @@
-package com.guava.baseutils.exception;
+package com.google.guava.baseutils.exception;
 
 import java.sql.BatchUpdateException;
 import java.sql.SQLException;
