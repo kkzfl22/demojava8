@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class HttpClientUtils {
 
-  private static final HttpClientUtils INSTANCE = new HttpClientUtils();
+  public static final HttpClientUtils INSTANCE = new HttpClientUtils();
 
   public static void main(String[] args) {
 
@@ -33,9 +33,10 @@ public class HttpClientUtils {
     //    INSTANCE.runFileFlow(19, 42, outPath, url, "003.ts");
 
     String url =
-        "https://res001.geekbang.org/media/audio/e6/a1/e6e57438c034f24899cabc658ee62ba1/ld/";
-    String outPath = "D:/java/test/meda/sksj/004/";
-    INSTANCE.runFileFlow(12, 44, outPath, url, "004.ts");
+        "https://res001.geekbang.org/media/audio/4b/6d/4bcbd0c69ba4116f0b5d46cef8c8a16d/";
+    String name = "16";
+    String outPath = "D:/java/test/meda/sksj/" + name + "/";
+    INSTANCE.runFileFlow(9, 55, outPath, url, name + ".ts");
   }
 
   public void runFileFlow(int min, int sec, String outPath, String url, String margeName) {
@@ -54,47 +55,7 @@ public class HttpClientUtils {
       System.out.println("download over :" + item);
     }
 
-    INSTANCE.margetFile(outPath, outPath + margeName);
-  }
-
-  public void margetFile(String inputPath, String margeOutFile) {
-    File readfile = new File(inputPath);
-
-    if (readfile.exists()) {
-      String[] name = readfile.list();
-
-      Arrays.sort(name);
-
-      for (int i = 0; i < name.length; i++) {
-        marge(inputPath + "/" + name[i], margeOutFile);
-      }
-    }
-  }
-
-  public void marge(String input, String output) {
-    FileInputStream inputStream = null;
-    FileOutputStream outputStream = null;
-    try {
-      inputStream = new FileInputStream(input);
-      outputStream = new FileOutputStream(output, true);
-
-      byte[] buffer = new byte[8 * 1024];
-      int readIndex = -1;
-
-      while ((readIndex = inputStream.read(buffer)) != -1) {
-        outputStream.write(buffer, 0, readIndex);
-      }
-
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e2) {
-      e2.printStackTrace();
-    } finally {
-      IOUtils.closeQuietly(outputStream);
-      IOUtils.closeQuietly(inputStream);
-    }
-
-    new File(input).delete();
+    FileMarge.MARGEINSTANCE.margetFile(outPath, outPath + margeName);
   }
 
   public List<String> countDownloadFIle(int min, int sec) {
@@ -104,7 +65,7 @@ public class HttpClientUtils {
 
     int runcount = maxSec % 10;
 
-    runcount = runcount == 0 ? maxSec / 10 : maxSec / 10 + 2;
+    runcount = runcount == 0 ? maxSec / 10 + 1 : maxSec / 10 + 2;
 
     List<String> list = new ArrayList<>(runcount);
 
