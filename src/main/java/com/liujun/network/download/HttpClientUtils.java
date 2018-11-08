@@ -33,10 +33,10 @@ public class HttpClientUtils {
     //    INSTANCE.runFileFlow(19, 42, outPath, url, "003.ts");
 
     String url =
-        "https://res001.geekbang.org/media/audio/4b/6d/4bcbd0c69ba4116f0b5d46cef8c8a16d/";
-    String name = "16";
+        "https://res001.geekbang.org/media/audio/af/c2/afadf162f3ff15c36d6f9d5b776b94c2/ld/";
+    String name = "021";
     String outPath = "D:/java/test/meda/sksj/" + name + "/";
-    INSTANCE.runFileFlow(9, 55, outPath, url, name + ".ts");
+    INSTANCE.runFileFlow(14, 28, outPath, url, name + ".ts");
   }
 
   public void runFileFlow(int min, int sec, String outPath, String url, String margeName) {
