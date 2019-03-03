@@ -9,10 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 下载极客邦的音频文件
@@ -33,14 +30,15 @@ public class HttpClientUtils {
     //    INSTANCE.runFileFlow(19, 42, outPath, url, "003.ts");
 
     String url =
-        "https://res001.geekbang.org/media/audio/af/c2/afadf162f3ff15c36d6f9d5b776b94c2/ld/";
-    String name = "021";
+        "https://res001.geekbang.org/media/audio/23/64/23148412d9a28570e7f4443d2f8fd764/ld/";
+    String name = "047";
     String outPath = "D:/java/test/meda/sksj/" + name + "/";
-    INSTANCE.runFileFlow(14, 28, outPath, url, name + ".ts");
+    INSTANCE.runFileFlow(8, 23, outPath, url, name + ".ts", "ld-");
   }
 
-  public void runFileFlow(int min, int sec, String outPath, String url, String margeName) {
-    List<String> list = INSTANCE.countDownloadFIle(min, sec);
+  public void runFileFlow(
+      int min, int sec, String outPath, String url, String margeName, String suffix) {
+    List<String> list = INSTANCE.countDownloadFIle(min, sec, suffix);
 
     File outFs = new File(outPath);
 
@@ -58,7 +56,7 @@ public class HttpClientUtils {
     FileMarge.MARGEINSTANCE.margetFile(outPath, outPath + margeName);
   }
 
-  public List<String> countDownloadFIle(int min, int sec) {
+  public List<String> countDownloadFIle(int min, int sec, String suffix) {
     int maxSec = min * 60 + sec;
 
     int maxBig = 5;
@@ -72,7 +70,7 @@ public class HttpClientUtils {
     for (int i = 1; i <= runcount; i++) {
       StringBuilder resultMsg = new StringBuilder();
 
-      resultMsg.append("ld-");
+      resultMsg.append(suffix);
       String curBig = String.valueOf(i);
       for (int j = curBig.length(); j < maxBig; j++) {
         resultMsg.append("0");
