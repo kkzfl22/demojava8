@@ -1,5 +1,6 @@
 package com.liujun.network.download;
 
+import com.utils.retry.RetryFunctionImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -22,6 +23,15 @@ public class HttpClientUtils {
 
   public static final HttpClientUtils INSTANCE = new HttpClientUtils();
 
+  /** 输入下载的参数 */
+  private static final String DOWNLOAD_PARAM_URL = "url";
+
+  /** 输出参数 */
+  private static final String DOWNLOAD_PARAM_OUTPUT = "output";
+
+  /** 参数的id */
+  private static final String DOWNLOAD_PARAM_ID = "download_id";
+
   public static void main(String[] args) {
 
     //    String url =
@@ -29,11 +39,11 @@ public class HttpClientUtils {
     //    String outPath = "D:/java/test/meda/sksj/003/";
     //    INSTANCE.runFileFlow(19, 42, outPath, url, "003.ts");
 
-    String url =
-        "https://res001.geekbang.org//media/audio/13/13/1327be2b53f2a20204053a4551dec613/ld/";
-    String name = "056";
+    String url = "https://res001.geekbang.org/media/audio/9e/e7/9e9694e286b2c5b19d0bf8c97961abe7/";
+    String name = "009";
     String outPath = "D:/java/test/meda/sksj/" + name + "/";
-    INSTANCE.runFileFlow(15, 16, outPath, url, name + ".ts", "ld-");
+    INSTANCE.runFileFlow(10, 33, outPath, url, name + ".ts", "ld-");
+    System.out.println("下载完成");
   }
 
   public void runFileFlow(
@@ -48,7 +58,7 @@ public class HttpClientUtils {
 
     for (int i = 0; i < list.size(); i++) {
       String item = list.get(i);
-      downLoadByHttpClient(url, outPath, item);
+      retryMethod(url, outPath, item);
 
       System.out.println("download over :" + item);
     }
@@ -83,7 +93,43 @@ public class HttpClientUtils {
     return list;
   }
 
-  public static void downLoadByHttpClient(String url, String outPath, String nameid) {
+  public void retryMethod(String url, String outPath, String nameid) {
+    Map<String, Object> runParam = new HashMap<>();
+
+    runParam.put(DOWNLOAD_PARAM_URL, url);
+    runParam.put(DOWNLOAD_PARAM_OUTPUT, outPath);
+    runParam.put(DOWNLOAD_PARAM_ID, nameid);
+
+    Boolean downRsp = (Boolean) RetryFunctionImpl.INSTANCE.applyRun(this::retryDownload, runParam);
+
+    System.out.println("下载结果:" + downRsp);
+  }
+
+  /**
+   * 进行下载重试操作
+   *
+   * @param param 参数信息
+   * @return 参数信息
+   */
+  public boolean retryDownload(Map<String, Object> param) {
+
+    String url = String.valueOf(param.get(DOWNLOAD_PARAM_URL));
+    String outPath = String.valueOf(param.get(DOWNLOAD_PARAM_OUTPUT));
+    String downloadId = String.valueOf(param.get(DOWNLOAD_PARAM_ID));
+
+    try {
+      downLoadByHttpClient(url, outPath, downloadId);
+
+      return true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return false;
+  }
+
+  public static void downLoadByHttpClient(String url, String outPath, String nameid)
+      throws IOException {
 
     // 创建httpclient实例，采用默认的参数配置
     CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -121,6 +167,7 @@ public class HttpClientUtils {
         out.flush();
       } catch (IOException e) {
         e.printStackTrace();
+        throw e;
       } finally {
         IOUtils.closeQuietly(out);
       }

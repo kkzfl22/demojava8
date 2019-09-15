@@ -1,7 +1,6 @@
 package com.liujun.base.javaCompress.zip;
 
-import com.utils.DiskIoUtils;
-import org.apache.commons.io.IOUtils;
+import com.utils.IOUtils;
 
 import java.io.*;
 import java.util.zip.*;
@@ -50,17 +49,17 @@ public class ZipCompress {
       File srcFile = new File(srcPath);
 
       // 进行打zip包
-      this.zip(zos, srcFile, srcFile.getName());
+      this.zip(zos, srcFile, "");
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      DiskIoUtils.close(zos);
-      DiskIoUtils.close(bufferOutput);
-      DiskIoUtils.close(csum);
-      DiskIoUtils.close(foutputStream);
+      IOUtils.close(zos);
+      IOUtils.close(bufferOutput);
+      IOUtils.close(csum);
+      IOUtils.close(foutputStream);
     }
   }
 
@@ -104,8 +103,8 @@ public class ZipCompress {
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      DiskIoUtils.close(buffredInput);
-      DiskIoUtils.close(read);
+      IOUtils.close(buffredInput);
+      IOUtils.close(read);
     }
   }
 }

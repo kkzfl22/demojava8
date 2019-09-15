@@ -11,9 +11,9 @@ import java.io.IOException;
  * @version 0.0.1
  * @date 2019/06/03
  */
-public class DiskIoUtils {
+public class IOUtils {
 
-  private static final Logger logger = LoggerFactory.getLogger(DiskIoUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
 
   public static void close(Closeable diskClose) {
     if (null != diskClose) {
@@ -21,7 +21,7 @@ public class DiskIoUtils {
         diskClose.close();
       } catch (IOException e) {
         e.printStackTrace();
-        logger.error("DiskIoUtils close", e);
+        logger.error("IOUtils close", e);
       }
     }
   }
