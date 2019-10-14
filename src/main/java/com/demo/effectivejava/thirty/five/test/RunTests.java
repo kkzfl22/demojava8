@@ -15,7 +15,7 @@ public class RunTests {
 		int tests = 0;
 		int passed = 0;
 
-		String testClassName = "com.demo.effectivejava.thirty.five.Sample";
+		String testClassName = "com.mockedandInjectable.effectivejava.thirty.five.Sample";
 
 		Class testClass = Class.forName(testClassName);
 

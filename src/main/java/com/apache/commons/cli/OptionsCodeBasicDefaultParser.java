@@ -54,7 +54,7 @@ public class OptionsCodeBasicDefaultParser {
     } catch (ParseException e) {
      //
       // 显示帮助信息
-      formatter.printHelp("common-cli-demo", opts);
+      formatter.printHelp("common-cli-mockedandInjectable", opts);
 
       System.out.println();
       e.printStackTrace();

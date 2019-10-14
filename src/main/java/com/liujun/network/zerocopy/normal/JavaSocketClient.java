@@ -49,6 +49,7 @@ public class JavaSocketClient {
         output.write(cachedata, 0, readIndex);
         sumdata = sumdata + readIndex;
       }
+      //to do Pipe
       // System.out.println("共写入:" + sumdata / 1024 / 1024.0f + "M");
     } catch (IOException e) {
       e.printStackTrace();

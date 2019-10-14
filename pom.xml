@@ -36,13 +36,6 @@
             <version>1.4</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-        </dependency>
-
 
         <!-- https://mvnrepository.com/artifact/org.apache.ignite/ignite-core -->
 
@@ -167,6 +160,29 @@
         </dependency>
 
 
+        <!-- 如果使用Junit4.5以上 jmockit依赖需要在junit4之前 -->
+        <!-- 或者在测试类上添加注解 @RunWith(JMockit.class) -->
+        <!-- 如果是TestNG 6.2+ 或者 JUnit 5+， 没有位置限制 -->
+        <!--经过测试发现jmockit的功能最全，覆盖的场景最多，所以选择了jmockit-->
+        <dependency>
+            <groupId>org.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <version>1.30</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+        <!-- servlet依赖的jar包start -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
 
     </dependencies>
 
@@ -180,6 +196,14 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
+                <configuration>
+                    <disableXmlReport>true</disableXmlReport>
+                    <argLine>-Dcoverage-metrics=all</argLine>
                 </configuration>
             </plugin>
         </plugins>
