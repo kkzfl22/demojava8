@@ -15,7 +15,7 @@ import java.io.IOException;
 public class SnappyDemo {
 
   @Test
-  public void strCompress() {
+  public void strCompress() throws InterruptedException {
     String comp =
         "Snappy is a compression/decompression library. It does not aim for maximum compression, "
             + "or compatibility with any other compression library; instead, it aims "
@@ -41,6 +41,9 @@ public class SnappyDemo {
       System.out.println("compress before array :" + new String(beforeValueBytes));
       System.out.println("compress before array length:" + beforeValueBytes.length);
 
+      
+      Thread.sleep(100000);
+      
     } catch (IOException e) {
       e.printStackTrace();
     }

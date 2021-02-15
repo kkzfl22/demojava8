@@ -7,11 +7,41 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <springboot.version>2.1.7.RELEASE</springboot.version>
     </properties>
 
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${springboot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${springboot.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!--Redis -->
         <dependency>
@@ -38,8 +68,6 @@
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.ignite/ignite-core -->
-
-
         <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-core</artifactId>
@@ -143,7 +171,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.10</version>
+            <version>1.7.26</version>
         </dependency>
 
         <dependency>
@@ -184,6 +212,25 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+
+
     </dependencies>
 
 
@@ -198,14 +245,15 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
-                <configuration>
-                    <disableXmlReport>true</disableXmlReport>
-                    <argLine>-Dcoverage-metrics=all</argLine>
-                </configuration>
-            </plugin>
+            <!--去掉jmockit的单元测试覆盖的生成-->
+            <!--            <plugin>-->
+            <!--                <artifactId>maven-surefire-plugin</artifactId>-->
+            <!--                <version>2.20</version>-->
+            <!--                <configuration>-->
+            <!--                    <disableXmlReport>true</disableXmlReport>-->
+            <!--                    <argLine>-Dcoverage-metrics=all</argLine>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 

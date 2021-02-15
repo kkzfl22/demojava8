@@ -36,4 +36,20 @@ public class BaseAnOrdinaryClassWithBlock {
   public static int getStaticInitValue() {
     return staticInitValue;
   }
+
+  public boolean insert(String key,String value) {
+    return true;
+  }
+
+  public boolean update(String key,String value) {
+    return true;
+  }
+
+  public boolean delete(String key) {
+    return true;
+  }
+
+  public String query(String key) {
+    return "rs";
+  }
 }

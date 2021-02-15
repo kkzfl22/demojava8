@@ -1,0 +1,10 @@
+.idea/
+.idea/**/workspace.xml
+.idea/**
+coverage-report/
+target/
+target/**
+/.apt_generated/
+/.apt_generated_tests/
+/logs/
+/demojava8.iml
