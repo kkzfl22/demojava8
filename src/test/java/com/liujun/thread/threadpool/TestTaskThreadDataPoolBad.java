@@ -18,7 +18,7 @@ public class TestTaskThreadDataPoolBad {
   public void dataTest() {
     // 声明线程池
     TaskThreadDataPoolBad taskPool =
-        new TaskThreadDataPoolBad(1, 4, 30, TimeUnit.SECONDS, 8, new TaskThreadFactory());
+        new TaskThreadDataPoolBad(1, 4, 30, TimeUnit.SECONDS, 8, new TaskThreadFactory("test"));
 
     for (int i = 0; i < 30; i++) {
       taskPool.submit(

@@ -29,6 +29,16 @@ public class TestThreadPool {
     }
   }
 
+
+  @Test
+  public void testNewFixedThreadPoolOom2() {
+    //SingleThreadExecutor
+    ExecutorService dataPool = Executors.newSingleThreadExecutor();
+    for (int i = 0; i < Integer.MAX_VALUE; i++) {
+      dataPool.submit(new DataSender(fullData()));
+    }
+  }
+
   @Test
   public void testThreadPoolOK() {
     ThreadPoolExecutor dataPool =
@@ -38,7 +48,7 @@ public class TestThreadPool {
             0,
             TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(8),
-            new TaskThreadFactory(),
+            new TaskThreadFactory("demo"),
             new ThreadPoolExecutor.AbortPolicy());
     for (int i = 0; i < Integer.MAX_VALUE; i++) {
       dataPool.submit(new DataSender(fullData()));
@@ -48,6 +58,14 @@ public class TestThreadPool {
   @Test
   public void testNewCacheThreadPoolOom() {
     ExecutorService dataPool = Executors.newCachedThreadPool();
+    for (int i = 0; i < Integer.MAX_VALUE; i++) {
+      dataPool.submit(new DataSender(fullData()));
+    }
+  }
+
+  @Test
+  public void testNewCacheThreadPoolOom2() {
+    ExecutorService dataPool = Executors.newScheduledThreadPool(10);
     for (int i = 0; i < Integer.MAX_VALUE; i++) {
       dataPool.submit(new DataSender(fullData()));
     }

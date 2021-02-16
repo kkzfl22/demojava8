@@ -1,7 +1,10 @@
 package com.liujun.thread.threadpool;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +42,22 @@ public class TaskThreadDataPoolDefault {
           KEEP_ALIVE_TIME,
           TimeUnit.SECONDS,
           queue,
-          new TaskThreadFactory(),
+          new TaskThreadFactory("dataTest"),
+          new ThreadPoolExecutor.CallerRunsPolicy());
+
+  /** 线程工厂 */
+  private ThreadFactory threadFactory =
+      new ThreadFactoryBuilder().setNameFormat("threadNamePrefix-%d").setDaemon(true).build();
+
+  /** 线程池 */
+  private ThreadPoolExecutor threadPoolData =
+      new ThreadPoolExecutor(
+          CORE_SIZE,
+          MAX_POOL_SIZE,
+          KEEP_ALIVE_TIME,
+          TimeUnit.SECONDS,
+          queue,
+          threadFactory,
           new ThreadPoolExecutor.CallerRunsPolicy());
 
   /**

@@ -146,6 +146,27 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Futur
 
 
 
+讲完了**FixedThreadPool**的一些问题，还有一个与此问题是一样的，那就是：**SingleThreadExecutor**
+
+
+
+```
+    public static ExecutorService newSingleThreadExecutor() {
+        return new FinalizableDelegatedExecutorService
+            (new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>()));
+    }
+    
+    public LinkedBlockingQueue() {
+        this(Integer.MAX_VALUE);
+    }
+```
+
+一个无界的队列方式。
+
+
+
 
 
 ## 坑2-newCachedThreadPool
@@ -209,6 +230,31 @@ Java HotSpot(TM) 64-Bit Server VM warning: Attempt to allocate stack guard pages
 ### 解决方案:
 
 这个问题的解决方案与newFixedThreadPool是一样的。将核心线程数与最大线程数，固定下来，设置任务队列大小，及拒绝策略后就可以了。
+
+
+
+
+
+
+
+newCachedThreadPool的问题讲完成了，还一个问题一样的,那就是**ScheduledThreadPool** 
+
+```java
+    public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
+        return new ScheduledThreadPoolExecutor(corePoolSize);
+    }
+
+    public ScheduledThreadPoolExecutor(int corePoolSize) {
+        super(corePoolSize, Integer.MAX_VALUE, 0, NANOSECONDS,
+              new DelayedWorkQueue());
+    }
+```
+
+
+
+
+
+
 
 
 
@@ -741,6 +787,16 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Futur
 
 
 
+如果用图来表示就是:
+
+![](D:\doc\博客\数据结构与算法\多线程\线程池的坑\默认线程池的行为.png)
+
+
+
+
+
+
+
 ## 以响应优先的线程池分析
 
 这是线程池提供的默认线程池的处理策略，针对一些常规的任务来说没有什么问题，比如定时任务啊，后台计算啊，这类任务并不关心任务的先后顺序，只要执行了即可，但还有一些任务就不是这样子，比如用户的响应，那是不能采用这种工作行为的，可以脑补下，当100个用户同时访问网站，我们限制了核心线程数为20,最大线程数为40，队列为100，前20个用户请求将被首先放入到线程池的核心线程中执行，还剩余80个用户请求。这时候所有的用户请求将都被放入到队列中。明明还空余那个线程。却不能提供服务，所以在这种以响应优先的场景下，是不能采用这种默认的线程池策略的。
@@ -1245,6 +1301,113 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Futur
 
 
 
+激动版本的线程池的策略:
+
+![](D:\doc\博客\数据结构与算法\多线程\线程池的坑\激动线程池的行为.png)
+
+
+
+
+
+
+
+
+
+## 最佳实践：
+
+### 一定要给线程设置一个有意义的名称。
+
+此为必须，一定要注意，此举的意义在于在出现问题时，一个有意义的线程名称，能够方便的找出出现问题的线程池。
+
+可使用guava库
+
+```java
+  /** 线程工厂 */
+  private ThreadFactory threadFactory =
+      new ThreadFactoryBuilder().setNameFormat("threadNamePrefix-%d").setDaemon(true).build();
+
+  /** 线程池 */
+  private ThreadPoolExecutor threadPoolData =
+      new ThreadPoolExecutor(
+          CORE_SIZE,
+          MAX_POOL_SIZE,
+          KEEP_ALIVE_TIME,
+          TimeUnit.SECONDS,
+          queue,
+          threadFactory,
+          new ThreadPoolExecutor.CallerRunsPolicy());
+```
+
+自定义的方式：
+
+```java
+/**
+ * 给线程池中的线程设置一个有意义的名称，用于在dump线程栈后，可以很方便的对问题进行排查
+ *
+ */
+public class TaskThreadFactory implements ThreadFactory {
+
+  /** 编号 */
+  private final AtomicInteger threadNum = new AtomicInteger(0);
+
+  /** 名称 */
+  private final String name;
+
+  public TaskThreadFactory(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public Thread newThread(@NotNull Runnable r) {
+    Thread t = new Thread(r);
+    t.setName(name + "-" + threadNum.incrementAndGet());
+    return t;
+  }
+}
+
+
+
+  /** 线程池创建 */
+  private ThreadPoolExecutor threadPool =
+      new ThreadPoolExecutor(
+          CORE_SIZE,
+          MAX_POOL_SIZE,
+          KEEP_ALIVE_TIME,
+          TimeUnit.SECONDS,
+          queue,
+          new TaskThreadFactory("dataTest"),
+          new ThreadPoolExecutor.CallerRunsPolicy());
+
+```
+
+
+
+
+
+### 线程数设置通用计算公式:
+
+
+
+CPU密集型任务: N + 1
+
+这种任务主要消耗的是CPU资源，可以将线程数设置N(CPU核心数)+1，比CPU核心数多出一个线程是为了防止线程偶发的缺页中断，或者其他原因导致的任务暂停而带来的影响。一旦CPU处于究竟状态，而这种情况下，多出来的一个线程就可以充分利用CPU的空闲时间。
+
+
+
+I/O密集型任务： 2N
+
+这种任务启动后，大部分时间来处理I/O交互。而线程处理I/O不会占用CPU来处理，这时可以可将CPU交给其他线程使用，因此在I/O密集型任务中，可以多配制一些线程，一般来说可以配制为2N
+
+
+
+那如何判断是I/O密集型还是CPU密集型呢？
+
+CPU密集型就是利用CPU密集型的计算任务，比如在内存中进行大量的排序。
+
+I/O密集型就是涉及网络读取、文件这类任务。这类任务的特点是CPU计算所耗费的时间比于IO操作完成的时间少很多。大部时间都花在等待IO操作完成上。
+
+
+
 ## 总结
 
 这就是我的一些在线程池上的啃坑实录及其行为分析了，通过这些分析，我对jdk的线程池的行为为什么是这样了有了更深的理解，做到了知其然，更知其所以然，更是通过一个激进版的线程池，展示了优先开启线程再加入到队列的一个方案。对于线程池，总结了几个最佳实践：
@@ -1253,6 +1416,8 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Futur
 2. 混用线程池也有很大的坑。对于CPU密集型任务以及IO密集型任务，对于资源的需求不同，选择不同的线程池。如果混用，必然导致相互干扰，其结果就是更低的性能，这个最好的实践还是将各种不同类型的任务分别创建线程池，以避免相互干扰。
 
 
+
+对于这些代码，我已经上传[github](https://github.com/kkzfl22/demojava8/blob/master/src/main/java/com/liujun/thread/threadpool/TaskThreadDataPoolGood.java)，可去github上查看。
 
 
 

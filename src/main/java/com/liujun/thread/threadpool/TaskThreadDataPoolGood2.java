@@ -1,11 +1,14 @@
 package com.liujun.thread.threadpool;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +51,8 @@ public class TaskThreadDataPoolGood2 {
   /** 最大的保持的时间 */
   private static final int KEEP_ALIVE_TIME = 60;
 
+
+
   /** 线程池信息 */
   private ThreadPoolExecutor THREAD_POOL =
       new ThreadPoolExecutor(CORE_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, QUEUE);
@@ -82,7 +87,6 @@ public class TaskThreadDataPoolGood2 {
     return MAX_SIZE + MAX_POOL_SIZE;
   }
 
-
   /**
    * 获取线程池
    *
@@ -91,7 +95,6 @@ public class TaskThreadDataPoolGood2 {
   public ThreadPoolExecutor getThreadPool() {
     return THREAD_POOL;
   }
-
 
   /**
    * 提交任务至线程池
