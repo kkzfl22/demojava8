@@ -21,7 +21,7 @@ public class ProcessBuilderLinuxMain {
     // 异步的执行
     instance.asynchronousDoCommand();
     // 同步的执行
-    instance.synchornousDoCommand();
+    // instance.synchornousDoCommand();
   }
 
   /** 异步执行命令 */
@@ -43,6 +43,7 @@ public class ProcessBuilderLinuxMain {
   private void runAsyncCommand(String commandStr) {
     List<String> commandList = Arrays.asList("bash", "-c", commandStr);
     AsynchronousLocalShellCommand command = new AsynchronousLocalShellCommand(commandList);
+    command.doCommand();
     for (int i = 0; i < 3; i++) {
       int code = command.rspProcess();
       String outData = command.getOutDat();
@@ -60,7 +61,7 @@ public class ProcessBuilderLinuxMain {
     System.out.println("结束--------");
   }
 
-  /** 异步执行命令 */
+  /** 同步执行命令 */
   private void synchornousDoCommand() {
     this.runSyncCommand("ping -c 5 www.baidu.com");
     this.runSyncCommand("/home/liujun/datarun/shell/run.sh");
@@ -74,9 +75,7 @@ public class ProcessBuilderLinuxMain {
    */
   private void runSyncCommand(String commandStr) {
     List<String> commandList = Arrays.asList("bash", "-c", commandStr);
-
     SynchronousLocalShellCommand command = new SynchronousLocalShellCommand(commandList);
-
     String commandRsp = command.doCommand();
     System.out.println("同步执行结果:" + commandRsp);
     System.out.println("结束---------------");

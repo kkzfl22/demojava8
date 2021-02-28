@@ -37,20 +37,14 @@ public class SynchronousLocalShellCommand {
    * @return 命令执行结果
    */
   public String doCommand() {
-
     ProcessBuilder processBuilder = new ProcessBuilder(command);
     try {
-      List<String> commandList = processBuilder.command();
       // 将错误输出流转移到标准输出流中,但使用Runtime不可以
       processBuilder.redirectErrorStream(true);
-
       Process process = processBuilder.start();
       String dataMsg = reader(process.getInputStream());
-
       int rsp = process.waitFor();
-
       logger.info("run command {}, response {}", command, rsp);
-
       return dataMsg;
     } catch (IOException | InterruptedException e) {
       logger.error("command : {} ,exception", command, e);

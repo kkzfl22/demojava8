@@ -32,10 +32,10 @@ public class AsynchronousLocalShellCommand implements Runnable {
   private final List<String> command;
 
   /** 运行的处理流程 */
-  private final Process process;
+  private Process process;
 
   /** 数据的输出流 */
-  private final InputStream input;
+  private InputStream input;
 
   /** 输出信息 */
   private final StringBuilder outDat = new StringBuilder();
@@ -48,25 +48,24 @@ public class AsynchronousLocalShellCommand implements Runnable {
 
   public AsynchronousLocalShellCommand(List<String> command) {
     this.command = command;
-    // 获取操作流
-    this.process = this.getCommandProcess();
-    // 获取子进程的输入流。输入流获得由该 Process 对象表示的进程的标准输出流。
-    input = process.getInputStream();
-    // 将任务提交线程池异步运行
-    TaskThreadDataPool.INSTANCE.submit(this);
   }
 
-  /** 本地运行命令的进程 */
-  private Process getCommandProcess() {
+  /** 开始执行命令 */
+  public void doCommand() {
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command);
       // 将错误输出流转移到标准输出流中,但使用Runtime不可以
       processBuilder.redirectErrorStream(true);
-      return processBuilder.start();
+      this.process = processBuilder.start();
     } catch (IOException e) {
       logger.error("command : {} ,exception", command, e);
     }
-    return null;
+
+    // 获取子进程的输入流。输入流获得由该 Process 对象表示的进程的标准输出流。
+    input = process.getInputStream();
+
+    // 成功时才将任务提交线程池运行
+    TaskThreadDataPool.INSTANCE.submit(this);
   }
 
   @Override

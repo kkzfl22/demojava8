@@ -14,16 +14,24 @@ import java.util.List;
  */
 public class TestSynchronousLocalShellCommand {
 
-  /** 异步执行命令 */
+  /** 同步执行命令 */
   @Test
   public void synchornousDoCommand() {
-    this.runCommand("ipconfig /all");
+    // 运行一个正常的命令
     this.runCommand("ping www.baidu.com");
+    // 运行一个bat脚本
+    this.runCommand("D:/run/bat/run.bat");
+    // 错误命令
     this.runCommand("abcdef");
   }
 
+  /**
+   * 运行command
+   *
+   * @param commandStr 错误命令行
+   */
   private void runCommand(String commandStr) {
-    List<String> commandList = Arrays.asList("cmd.exe", "/c", commandStr);
+    List<String> commandList = Arrays.asList("cmd.exe","/C",commandStr);
     SynchronousLocalShellCommand command = new SynchronousLocalShellCommand(commandList);
 
     String commandRsp = command.doCommand();
