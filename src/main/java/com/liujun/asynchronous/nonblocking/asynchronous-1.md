@@ -1,4 +1,4 @@
-# java实现异步非阻塞的几种方式
+# java实现异步非阻塞的几种方式-1
 
 ## 1. 同步阻塞调用
 
@@ -466,9 +466,11 @@ IO会阻塞在：java.net.SocketInputStream#socketRead0 的native方法上。
 
 
 
+
+
 这是最基础的同步调用模型，详细代码可查看我的github:
 
-
+https://github.com/kkzfl22/demojava8/blob/master/src/main/java/com/liujun/asynchronous/nonblocking/invoke/synchronous/OrderServerFacade.java
 
 
 
