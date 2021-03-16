@@ -1,4 +1,4 @@
-package com.liujun.asynchronous.nonblocking.invoke.common;
+package com.liujun.asynchronous.nonblocking.invoke.bean;
 
 /**
  * 订单相关的信息

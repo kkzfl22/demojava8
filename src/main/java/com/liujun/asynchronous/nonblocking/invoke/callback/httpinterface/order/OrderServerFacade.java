@@ -1,10 +1,10 @@
-package com.liujun.asynchronous.nonblocking.invoke.callback.httpcallback;
+package com.liujun.asynchronous.nonblocking.invoke.callback.httpinterface.order;
 
 import com.liujun.asynchronous.nonblocking.common.ApiResponse;
 import com.liujun.asynchronous.nonblocking.common.utils.RestTemplateUtils;
-import com.liujun.asynchronous.nonblocking.invoke.common.ClientGoodsDTO;
-import com.liujun.asynchronous.nonblocking.invoke.common.ClientUserDTO;
-import com.liujun.asynchronous.nonblocking.invoke.common.OrderDTO;
+import com.liujun.asynchronous.nonblocking.invoke.bean.ClientGoodsDTO;
+import com.liujun.asynchronous.nonblocking.invoke.bean.ClientUserDTO;
+import com.liujun.asynchronous.nonblocking.invoke.bean.OrderDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -43,8 +43,8 @@ public class OrderServerFacade {
   private RestTemplate restTemplate = RestTemplateUtils.INSTANCE.getRestTemplate();
 
   @RequestMapping(
-      value = "/orderInfo",
-      method = {RequestMethod.POST})
+          value = "/orderInfo",
+          method = {RequestMethod.POST})
   public ApiResponse getUserInfo(@RequestBody OrderDTO order) {
     logger.info("getUserInfo start {}", order);
     // 获取用户信息的请求发送
@@ -66,8 +66,8 @@ public class OrderServerFacade {
    * @return 获取响应信息
    */
   @RequestMapping(
-      value = "/getResponse",
-      method = {RequestMethod.POST})
+          value = "/getResponse",
+          method = {RequestMethod.POST})
   public ApiResponse getResponse(@RequestBody OrderDTO order) {
     logger.info("getResponse start {}", order);
     // 响应结果
@@ -86,8 +86,8 @@ public class OrderServerFacade {
    * @return 响应处理
    */
   @RequestMapping(
-      value = "/userCallBack",
-      method = {RequestMethod.POST})
+          value = "/userCallBack",
+          method = {RequestMethod.POST})
   public ApiResponse getUserCallBack(@RequestBody ClientUserDTO userDto) {
     logger.info("/userCallBack  {}", userDto);
     // 设置用户信息
@@ -105,8 +105,8 @@ public class OrderServerFacade {
    * @return
    */
   @RequestMapping(
-      value = "/goodsCallBack",
-      method = {RequestMethod.POST})
+          value = "/goodsCallBack",
+          method = {RequestMethod.POST})
   public ApiResponse getGoodsCallBack(@RequestBody ClientGoodsDTO goodsInfo) {
     logger.info("/goodscallBack {}", goodsInfo);
     // 设置用户信息
@@ -131,8 +131,8 @@ public class OrderServerFacade {
     // 将对象装入HttpEntity中
     HttpEntity<ClientUserDTO> request = new HttpEntity<>(clientUser, headers);
     ResponseEntity<String> result =
-        restTemplate.exchange(
-            "http://localhost:9000/user/getUserInfo", HttpMethod.POST, request, String.class);
+            restTemplate.exchange(
+                    "http://localhost:9000/user/getUserInfo", HttpMethod.POST, request, String.class);
     if (HttpStatus.OK.value() == result.getStatusCodeValue()) {
       return true;
     }
@@ -153,8 +153,8 @@ public class OrderServerFacade {
     // 将对象装入HttpEntity中
     HttpEntity<ClientGoodsDTO> request = new HttpEntity<>(clientGoods, headers);
     ResponseEntity<String> result =
-        restTemplate.postForEntity(
-            "http://localhost:9001/goods/getGoodsInfo", request, String.class);
+            restTemplate.postForEntity(
+                    "http://localhost:9001/goods/getGoodsInfo", request, String.class);
     if (HttpStatus.OK.value() == result.getStatusCodeValue()) {
       return true;
     }

@@ -1,16 +1,10 @@
-# java实现异步非阻塞的几种方式-接口回调
+# java实现异步非阻塞的几种方式-消息中间件
 
-## 3. 接口回调
+## 4. 消息中间件
 
-在异步阻塞的调用过程中线程还是会存在于阻塞中。等待响应的结果，那能不能在发起请求后就不再关心这个逻辑，而执行其他的任务呢？那就要用到callback机制。
+在前面已经实现了异步调用、接口回调两种形式，都较为复杂，需要自己控制多线程，那有没有简单点的方式来实现异步的消息通讯。这个当然是有的，可以使用消息中间件的形式，来实现整个消息的异步调用。还是以订单这个场景为示例来举个粟子。
 
-还是以订单查询为示例。先来说下整个的调用链吧。
-
-![](D:\doc\博客\总续实践\非阻塞式调用\callback\http-callback机制.png)
-
-当这个异步回调机制加入之后，原来order的等待的结果的响应就不存在，可以做其他的事情去了，等着其他用户和商品服务完成之后，调用即可。
-
-
+![](D:\doc\博客\总续实践\非阻塞式调用\消息中间件\消息中间件调用序列图.png)
 
 
 
@@ -19,140 +13,7 @@
 订单服务的代码：
 
 ```java
-@RestController
-@RequestMapping("/order")
-public class OrderServerFacade {
 
-  private Logger logger = LoggerFactory.getLogger(OrderServerFacade.class);
-
-  /** 用来存储订单的map */
-  private Map<String, OrderDTO> userMap = new HashMap<>();
-
-  /** 商品服务 */
-  private Map<String, OrderDTO> goodsMap = new HashMap<>();
-
-  /** 获取连接处理对象 */
-  private RestTemplate restTemplate = RestTemplateUtils.INSTANCE.getRestTemplate();
-
-  @RequestMapping(
-      value = "/orderInfo",
-      method = {RequestMethod.POST})
-  public ApiResponse getUserInfo(@RequestBody OrderDTO order) {
-    logger.info("getUserInfo start {}", order);
-    // 获取用户信息的请求发送
-    boolean userSender = this.getUserInfo(order.getUserId());
-    // 获取商品信息的请求发送
-    boolean goodsSender = this.getGoods(order.getGoodId());
-    logger.info("getUserInfo  request {} rsponse {} ", order.getUserId(), userSender);
-    logger.info("getGoods  request {} rsponse {} ", order.getGoodId(), goodsSender);
-    userMap.put(order.getUserId(), order);
-    goodsMap.put(order.getGoodId(), order);
-    // 构建结果的响应
-    return ApiResponse.ok();
-  }
-
-  /**
-   * 异步的订单的响应
-   *
-   * @param order 订单信息
-   * @return 获取响应信息
-   */
-  @RequestMapping(
-      value = "/getResponse",
-      method = {RequestMethod.POST})
-  public ApiResponse getResponse(@RequestBody OrderDTO order) {
-    logger.info("getResponse start {}", order);
-    // 响应结果
-    OrderDTO orderRsp = userMap.get(order.getUserId());
-    if (null != orderRsp) {
-      return ApiResponse.ok(orderRsp);
-    }
-    // 构建结果的响应
-    return ApiResponse.ok();
-  }
-
-  /**
-   * 用户信息响应的回调接口
-   *
-   * @param userDto 用户信息
-   * @return 响应处理
-   */
-  @RequestMapping(
-      value = "/userCallBack",
-      method = {RequestMethod.POST})
-  public ApiResponse getUserCallBack(@RequestBody ClientUserDTO userDto) {
-    logger.info("/userCallBack  {}", userDto);
-    // 设置用户信息
-    OrderDTO orderInfo = userMap.get(userDto.getUserId());
-    if (null != orderInfo) {
-      orderInfo.setUserInfo(userDto);
-    }
-    return ApiResponse.ok();
-  }
-
-  /**
-   * 商品服务的回调接口
-   *
-   * @param goodsInfo 商品信息
-   * @return
-   */
-  @RequestMapping(
-      value = "/goodsCallBack",
-      method = {RequestMethod.POST})
-  public ApiResponse getGoodsCallBack(@RequestBody ClientGoodsDTO goodsInfo) {
-    logger.info("/goodscallBack {}", goodsInfo);
-    // 设置用户信息
-    OrderDTO orderInfo = goodsMap.get(goodsInfo.getDataId());
-    if (null != orderInfo) {
-      orderInfo.setGoodsInfo(goodsInfo);
-    }
-    return ApiResponse.ok();
-  }
-
-  /**
-   * 获取用户的信息
-   *
-   * @param userId 用户的id
-   * @return 用户的信息
-   */
-  private boolean getUserInfo(String userId) {
-    logger.info("request get user info start {} ", userId);
-    ClientUserDTO clientUser = new ClientUserDTO();
-    clientUser.setUserId(userId);
-    HttpHeaders headers = new HttpHeaders();
-    // 将对象装入HttpEntity中
-    HttpEntity<ClientUserDTO> request = new HttpEntity<>(clientUser, headers);
-    ResponseEntity<String> result =
-        restTemplate.exchange(
-            "http://localhost:9000/user/getUserInfo", HttpMethod.POST, request, String.class);
-    if (HttpStatus.OK.value() == result.getStatusCodeValue()) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * 获取商品信息
-   *
-   * @param dataId 商品信息
-   * @return 当前的用户的信息
-   */
-  private boolean getGoods(String dataId) {
-    logger.info("request goods start {} ", dataId);
-    ClientGoodsDTO clientGoods = new ClientGoodsDTO();
-    clientGoods.setDataId(dataId);
-    HttpHeaders headers = new HttpHeaders();
-    // 将对象装入HttpEntity中
-    HttpEntity<ClientGoodsDTO> request = new HttpEntity<>(clientGoods, headers);
-    ResponseEntity<String> result =
-        restTemplate.postForEntity(
-            "http://localhost:9001/goods/getGoodsInfo", request, String.class);
-    if (HttpStatus.OK.value() == result.getStatusCodeValue()) {
-      return true;
-    }
-    return false;
-  }
-}
 ```
 
 订单服务相对于同步阻塞的服务，多提供了两个回调接口，分别是“/userCallBack”和"/goodsCallBack"这两个接口，这两个接口在收到数据后，将数据写入至本地的map中缓存起来，以供结果查询。

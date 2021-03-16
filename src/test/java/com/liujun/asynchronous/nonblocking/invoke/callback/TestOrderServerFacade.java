@@ -5,19 +5,13 @@ import com.google.gson.Gson;
 import com.liujun.asynchronous.nonblocking.common.APICodeEnum;
 import com.liujun.asynchronous.nonblocking.common.ApiResponse;
 import com.liujun.asynchronous.nonblocking.common.utils.RestTemplateUtils;
-import com.liujun.asynchronous.nonblocking.invoke.common.OrderDTO;
-import com.liujun.asynchronous.nonblocking.invoke.synchronous.OrderApplication;
+import com.liujun.asynchronous.nonblocking.invoke.bean.OrderDTO;
 import com.utils.ThreadUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 /**
