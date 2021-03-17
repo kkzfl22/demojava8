@@ -7,6 +7,8 @@ import com.rabbitmq.client.Channel;
 import com.utils.JsonUtils;
 import com.utils.ThreadUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
@@ -19,9 +21,11 @@ import org.springframework.stereotype.Service;
  * @author liujun
  * @version 0.0.1
  */
-@Slf4j
 @Service("userEventProcess")
 public class UserEventProcess implements ChannelAwareMessageListener {
+
+  /** 日志 */
+  private Logger logger = LoggerFactory.getLogger(UserEventProcess.class);
 
   /** 数据类型的标识信息 */
   public static final String DATA_TYPE = "DATA_TYPE";
@@ -41,6 +45,9 @@ public class UserEventProcess implements ChannelAwareMessageListener {
     if (DataTypeEnum.USER.getType().equals(dataType)) {
       UserDTO userData = this.receiveData(msgInfo);
       ThreadUtils.sleep(5);
+
+      logger.info("user event process  request {} response {}",msgInfo,userData);
+
       // 用户消息的发送
       this.sendData(userData, DataTypeEnum.USER.getType());
     }

@@ -53,7 +53,7 @@ public class OrderServerFacade {
   }
 
   @RequestMapping(
-      value = "/getOrderResponse",
+      value = "/getResponse",
       method = {RequestMethod.POST})
   public ApiResponse getOrderInfo(@RequestBody OrderDTO order) {
     logger.info("getOrderResponse start {}", order);

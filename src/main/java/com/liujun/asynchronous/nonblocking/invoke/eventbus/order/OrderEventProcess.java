@@ -7,7 +7,8 @@ import com.liujun.asynchronous.nonblocking.invoke.bean.OrderDTO;
 import com.liujun.asynchronous.nonblocking.invoke.eventbus.constants.DataTypeEnum;
 import com.rabbitmq.client.Channel;
 import com.utils.JsonUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liujun
  * @version 0.0.1
  */
-@Slf4j
 @Service("orderEventProcess")
 public class OrderEventProcess implements ChannelAwareMessageListener {
+
+  /** 日志 */
+  private Logger logger = LoggerFactory.getLogger(OrderEventProcess.class);
 
   /** 数据类型的标识信息 */
   public static final String DATA_TYPE = "DATA_TYPE";
@@ -69,6 +72,7 @@ public class OrderEventProcess implements ChannelAwareMessageListener {
     ClientUserDTO userRsp = JsonUtils.fromJson(data, new TypeToken<ClientUserDTO>() {}.getType());
     OrderDTO oderInfo = USER_MAP.get(userRsp.getUserId());
     if (oderInfo != null) {
+      logger.info("save user response {} ",userRsp);
       oderInfo.setUserInfo(userRsp);
     }
   }
@@ -83,6 +87,7 @@ public class OrderEventProcess implements ChannelAwareMessageListener {
         JsonUtils.fromJson(data, new TypeToken<ClientGoodsDTO>() {}.getType());
     OrderDTO orderInfo = GOODS_MAP.get(goodsRsp.getDataId());
     if (orderInfo != null) {
+      logger.info("save goods response : {}",goodsRsp);
       orderInfo.setGoodsInfo(goodsRsp);
     }
   }
