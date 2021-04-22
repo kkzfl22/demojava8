@@ -1,4 +1,4 @@
-package com.liujun.asynchronous.nonblocking.invoke.threadpool;
+package com.liujun.locked.threadpool;
 
 import com.constant.Symbol;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -6,35 +6,34 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 处理etl的调度任务处理
+ * java锁的线程池示例
  *
  * @author liujun
  * @version 0.0.1
  * @date 2019/08/31
  */
-public class ScheduleTaskThreadPool {
+public class TaskThreadPool {
 
   /** 进行任务调度的线程池对象 */
-  public static final ScheduleTaskThreadPool INSTANCE = new ScheduleTaskThreadPool();
+  public static final TaskThreadPool INSTANCE = new TaskThreadPool();
 
   /**
    * 线程池中的核心线程数，当提交一个任务时，线程池创建一个新线程执行任务，直到当前线程数等于corePoolSize；
    * 如果当前线程数为corePoolSize，继续提交的任务被保存到阻塞队列中，等待被执行；
    * 如果执行了线程池的prestartAllCoreThreads()方法，线程池会提前创建并启动所有核心线程。
    */
-  private static final int MIN_THREAD_NUM = 4;
+  private static final int MIN_THREAD_NUM = 8;
 
   /**
    * 线程池中允许的最大线程数。如果当前阻塞队列满了，且继续提交任务，则创建新的线程执行任务，
    *
    * <p>前提是当前线程数小于maximumPoolSize
    */
-  private static final int MAX_THREAD_NUM = 4;
+  private static final int MAX_THREAD_NUM = 8;
 
   /**
    * 线程池中允许的最大线程数。如果当前阻塞队列满了，且继续提交任务，则创建新的线程执行任务，
@@ -70,10 +69,6 @@ public class ScheduleTaskThreadPool {
    */
   private ArrayBlockingQueue queue = new ArrayBlockingQueue(WAIT_NUM);
 
-  /** 使用工厂创建线程池中的对象 */
-  public ThreadFactory threadFactory =
-      new ThreadFactoryBuilder().setNameFormat("schedule-%d").setDaemon(true).build();
-
   /**
    * 策略说明 1,ThreadPoolExecutor.AbortPolicy:丢弃任务并抛出RejectedExecutionException异常。
    *
@@ -90,8 +85,8 @@ public class ScheduleTaskThreadPool {
           KEEPALIVE,
           TimeUnit.SECONDS,
           queue,
-          threadFactory,
-          new ThreadPoolExecutor.AbortPolicy());
+          new ThreadFactoryBuilder().setNameFormat("order-%d").setDaemon(true).build(),
+          new ThreadPoolExecutor.CallerRunsPolicy());
 
   /**
    * 提交带返回值的线程给线程池来运行

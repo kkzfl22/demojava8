@@ -25,10 +25,10 @@ public class TaskThreadDataPool {
   private ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(MAX_SIZE);
 
   /** 最小核心线程数 */
-  private static final int CORE_SIZE = 2;
+  private static final int CORE_SIZE = 4;
 
   /** 最大的线程数 */
-  private static final int MAX_POOL_SIZE = 8;
+  private static final int MAX_POOL_SIZE = 4;
 
   /** 最大的保持的时间 */
   private static final int KEEP_ALIVE_TIME = 30;
