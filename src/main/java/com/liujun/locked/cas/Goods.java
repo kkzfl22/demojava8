@@ -3,6 +3,7 @@ package com.liujun.locked.cas;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -69,11 +70,11 @@ public class Goods {
       // 读取最新的volatile变量的值
       int goodsNumOld = UNSAFE.getIntVolatile(this, valueOffset);
       // 库存不足时，停止
-      if (goodsNumOld <= 0) {
+      if (goodsNumOld - num < 0) {
         break;
       }
-
       int goodsNumNew = goodsNumOld - num;
+      // 使用比较交换的原子操作执行更新
       updRsp = UNSAFE.compareAndSwapInt(this, valueOffset, goodsNumOld, goodsNumNew);
     } while (!updRsp);
   }

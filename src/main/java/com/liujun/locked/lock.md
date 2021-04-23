@@ -357,17 +357,58 @@ shutdown status:true
 
 
 
-为了解答这个问题，就得了解下java的内存模型。
+## 6.volatile
+
+> volatile作为java中的关键字之一，用于声明变量的值会随时被别的线程修改，使用volatile修饰的变量会强制将修改的值立即写入主存，主存中的值设置会使缓存中的值失效（非volatile变量不具备这样的特性，非volatile变量的值会被缓存，线程A更新了这个值，线程B读取到这个变量的值可能读到的并不是线程A修改后的值）。volatile禁止指令重排。
+>
+> volatile具有可见性、有序性，不具备原子性。
+>
+> 原子性：类比事务，通常原子性指多个操作不存在只执行一部分的情况，如果全部执行完成没有问题，如果只执行了部分，那就得摊销已经执行的部分。
+>
+> 可见性：当多个线程访问同一个变量A时，线程1修改了A的值，其他线程能够立即读取到A的值
+>
+> 有序性： 即程序按照书写的先后顺序执行。这主要是应用指令重排序的问题。在java的内存模型中，允许编译器和处理器对指令进行重新排序。但重排序的指令不会影响到单个线程的执行。却会影响并发执行的正确性。
+>
+> volatile  适用场景：
+>
+> 适用于对变量的写入不依赖当前的值，对变量的读取不依赖volatile变量
+>
+> 适用于读多写入的场景。
+>
+> 可用作状态标识。
+
+顺带来看下java的内存模型。
 
 ![](D:\doc\博客\总续实践\java中的锁\thread_stack.jpg)
 
-存放在堆上的对象可以被所有持有对这个对象引用的线程访问。当一个线程可以访问一个对象时，它也可以访问这个对象的成员变量。如果两个线程同时调用同一个对象上的同一个方法，它们将会都访问这个对象的成员变量，但是每一个线程都拥有这个成员变量的私有拷贝。因为是私有拷贝，在写入数据在写入时发生覆盖。
+存放在堆上的对象可以被所有持有对这个对象引用的线程访问。当一个线程可以访问一个对象时，它也可以访问这个对象的成员变量。如果两个线程同时调用同一个对象上的同一个方法，它们将会都访问这个对象的成员变量，但是每一个线程都拥有这个成员变量的私有拷贝。因为是私有拷贝，所以在写入数据在写入时发生覆盖。
+
+还有一个很重要的概念:happens-before
+
+>happens-before原则规则：
+>
+>1. 程序次序规则：一个线程内，按照代码顺序，书写在前面的操作先行发生于书写在后面的操作；
+>2. 锁定规则：一个unLock操作先行发生于后面对同一个锁额lock操作；
+>3. volatile变量规则：对一个变量的写操作先行发生于后面对这个变量的读操作；
+>4. 传递规则：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C；
+>5. 线程启动规则：Thread对象的start()方法先行发生于此线程的每个一个动作；
+>6. 线程中断规则：对线程interrupt()方法的调用先行发生于被中断线程的代码检测到中断事件的发生；
+>7. 线程终结规则：线程中所有的操作都先行发生于线程的终止检测，我们可以通过Thread.join()方法结束、Thread.isAlive()的返回值手段检测到线程已经终止执行；
+>8. 对象终结规则：一个对象的初始化完成先行发生于他的finalize()方法的开始；
+
+这里就讲到了volatile变量:这是一条比较重要的规则，它标志着volatile保证了线程可见性。通俗点讲就是如果一个线程先去写一个volatile变量，然后一个线程去读这个变量，那么这个写操作一定是happens-before读操作的。
 
 
 
-这个时候肯定会想到volitile关键字，保证内存的可见性。那volitile能保证正确吗？我们可以做一个尝试:
+由于单独volatile不能保证原子性，所以并不能实现示例要求的功能。
 
-```
+
+
+## 7.cas
+
+还是以下单场景为例，使用CAS机制来实现一个扣减库存的示例：
+
+```java
 public class Goods {
 
   /** 商品名称 */
@@ -376,25 +417,62 @@ public class Goods {
   /** 商品库存数量 添加volatile，保证内存的可见性 */
   private volatile int goodsNum;
 
+  private static final Unsafe UNSAFE = getUnsafe();
+
+  /** 值的偏移量 */
+  private static final long valueOffset;
+
+  /** 获取对象操作值的偏移量 */
+  static {
+    try {
+      valueOffset = UNSAFE.objectFieldOffset(Goods.class.getDeclaredField("goodsNum"));
+    } catch (Exception ex) {
+      throw new Error(ex);
+    }
+  }
+
   public Goods(String name, int goodsNum) {
     this.name = name;
     this.goodsNum = goodsNum;
   }
 
+  /**
+   * 获取unsafe对象
+   *
+   * @return
+   */
+  public static Unsafe getUnsafe() {
+    // 通过反射得到theUnsafe对应的Field对象
+    Field field;
+    try {
+      field = Unsafe.class.getDeclaredField("theUnsafe");
+      // 设置该Field为可访问
+      field.setAccessible(true);
+      // 通过Field得到该Field对应的具体对象，传入null是因为该Field为static的
+      Unsafe unsafe = (Unsafe) field.get(null);
+      return unsafe;
+    } catch (NoSuchFieldException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   /** 商品的库存扣减操作 */
   public void minusGoods(int num) {
-
-    Lock lock = new ReentrantLock();
-
-    lock.lock();
-    try {
-      // 数量检查
-      if (this.sellOut(num)) {
-        goodsNum = goodsNum - num;
+    boolean updRsp;
+    do {
+      // 读取最新的volatile变量的值
+      int goodsNumOld = UNSAFE.getIntVolatile(this, valueOffset);
+      // 库存不足时，停止
+      if (goodsNumOld - num < 0) {
+        break;
       }
-    } finally {
-      lock.unlock();
-    }
+      int goodsNumNew = goodsNumOld - num;
+      // 使用比较交换的原子操作执行更新
+      updRsp = UNSAFE.compareAndSwapInt(this, valueOffset, goodsNumOld, goodsNumNew);
+    } while (!updRsp);
   }
 
   /**
@@ -422,47 +500,50 @@ public class Goods {
 
 
 
-再次运行单元测试:
+运行结果:
 
-```java
+```
 结束,共运行:800次
 shutdown status:true
-最后商品的库存:5
-```
-
-可以看到，还是没有解决这个问题，数据依然存在问题。那是什么原因导致的这个问题呢？
-
-讲这个问题之前，还说下jvm中一个很重要的概念:happens-before
-
->happens-before原则规则：
->
->1. 程序次序规则：一个线程内，按照代码顺序，书写在前面的操作先行发生于书写在后面的操作；
->2. 锁定规则：一个unLock操作先行发生于后面对同一个锁额lock操作；
->3. volatile变量规则：对一个变量的写操作先行发生于后面对这个变量的读操作；
->4. 传递规则：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C；
->5. 线程启动规则：Thread对象的start()方法先行发生于此线程的每个一个动作；
->6. 线程中断规则：对线程interrupt()方法的调用先行发生于被中断线程的代码检测到中断事件的发生；
->7. 线程终结规则：线程中所有的操作都先行发生于线程的终止检测，我们可以通过Thread.join()方法结束、Thread.isAlive()的返回值手段检测到线程已经终止执行；
->8. 对象终结规则：一个对象的初始化完成先行发生于他的finalize()方法的开始；
-
-这里就讲到了volatile变量:这是一条比较重要的规则，它标志着volatile保证了线程可见性。通俗点讲就是如果一个线程先去写一个volatile变量，然后一个线程去读这个变量，那么这个写操作一定是happens-before读操作的。
-
-既然volatile保证了可见性，为何会导致这个问题呢？
-
-1. 当同时多个线程拿变量的值后，在操作过程中，很可能被其他的线程将值改变，故在操作数据时，很可能是拿到的旧的数据，这就导致了数据的不一致。
-2. 数据在写入时不能保证原子的写入，会发生数据的覆盖操作。
-
-针对这个问题，有没有什么解决办法呢?
-
-```
-
+最后商品的库存:0
 ```
 
 
 
+这里使用一个Unsafe这个类，Unsafe类是在sun.misc包下，不属于Java标准。但是很多Java的基础类库，包括一些被广泛使用的高性能开发库都是基于Unsafe类开发的，比如Netty、Cassandra、Hadoop、Kafka等。Unsafe类在提升Java运行效率，增强Java语言底层操作能力方面起了很大的作用。
+
+Unsafe类使Java拥有了像C语言的指针一样操作内存空间的能力，同时也带来了指针的问题。过度的使用Unsafe类会使得出错的几率变大，因此Java官方并不建议使用的。
+
+此处使用两个操作getIntVolatile,从名字我们就可以看到，这是一个获取int类型的volatile修饰的变量的值。还有一个操作是compareAndSwapInt使用比较交换的原子操作，对数据进行修改操作。
+
+如果你看过AtomicInteger的原码，你就会看到如上的代码的调用。
+
+```java
+    /**
+     * Atomically sets the value to the given updated value
+     * if the current value {@code ==} the expected value.
+     *
+     * @param expect the expected value
+     * @param update the new value
+     * @return {@code true} if successful. False return indicates that
+     * the actual value was not equal to the expected value.
+     */
+    public final boolean compareAndSet(int expect, int update) {
+        return unsafe.compareAndSwapInt(this, valueOffset, expect, update);
+    }
+```
+
+如果在平时的开发中，还是建议直接使用AtomicInteger已经封装好的类。
 
 
 
+
+
+## 总结
+
+在这章节，我总结了在java中常用的一些锁的实现方案。分别是synchronize、lock、volatile、cas这几种实现方案，并分别给出了源码。在jdk的对于锁的优化从未停止，从重量级锁到无锁，在不同的场景下，选择合适的锁。而且源码中有非常好的一些思路值得学习。
+
+下篇文章将继续分享数据库锁
 
 参考资料:
 
@@ -470,7 +551,9 @@ https://zhuanlan.zhihu.com/p/29881777
 
 https://www.cnblogs.com/chenssy/p/6393321.html
 
+https://baijiahao.baidu.com/s?id=1595669808533077617&wfr=spider&for=pc
 
+https://tech.meituan.com/2018/11/15/java-lock.html
 
 
 
